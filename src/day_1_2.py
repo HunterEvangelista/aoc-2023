@@ -19,9 +19,6 @@ def parse_file():
     }
 
     parsed_lines = []
-    # loop through each line with start
-    # if you confirm a number start can be current char + 1
-    # if you confirm it isn't a number then increment start_char by one
     with open("./data/aoc_2023_day_1_1_input.txt", "r") as input:
         start_point = 0
         current_char = 0
@@ -33,11 +30,11 @@ def parse_file():
                     # this resets the characters you are looking at
                     start_point += 1
                     current_char = start_point
-                    continue
-
-                if (length < 3):
+                elif (length < 3):
                     current_char += 1
-                    continue
+                elif length > 5:
+                    start_point += 1
+                    current_char = start_point
 
                 if length in {*numbers.keys()}:
                     current_chars = line[start_point::current_char + 1]
@@ -47,6 +44,15 @@ def parse_file():
                         current_char += 1
                         start_point = current_char
                         continue
+
+                parsed_line = parsed_line + line[char]
+            parsed_lines.append(parsed_line)
+    return parsed_lines
+
+
+def write_file(parsed_list):
+    with open("./data/aoc_2023_day_1_1_parsed.txt", "w") as file:
+        file.write("\n".join(line for line in parsed_list))
 
 
 def get_numbers():
