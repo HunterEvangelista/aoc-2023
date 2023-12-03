@@ -1,10 +1,4 @@
 def parse_file():
-    numbers = {
-        3: {"one", "two", "six"},
-        4: {"four", "five", "nine", "zero"},
-        5: {"eight", "three", "seven"},
-    }
-
     number_map = {
         "zero": "0",
         "one": "1",
@@ -19,46 +13,62 @@ def parse_file():
     }
 
     parsed_lines = []
+
     with open("./data/aoc_2023_day_1_1_input.txt", "r") as input:
-        start_point = 0
-        current_char = 0
         for line in input:
+            start_point = 0
+            current_point = 0
             parsed_line = ""
-            for char in range(line):
-                length = (current_char - start_point) + 1
-                if line[char].isinteger():
-                    # this resets the characters you are looking at
-                    start_point += 1
-                    current_char = start_point
-                elif (length < 3):
-                    current_char += 1
-                elif length > 5:
-                    start_point += 1
-                    current_char = start_point
+            while start_point < len(line):
+                selection_len = (current_point - start_point) + 1
 
-                if length in {*numbers.keys()}:
-                    current_chars = line[start_point::current_char + 1]
-                    if current_chars in numbers[length]:
-                        parsed_line = parsed_line[:start_point] + \
-                            number_map[current_chars]
-                        current_char += 1
-                        start_point = current_char
-                        continue
+                # add current element to the parsed string
+                if current_point > len(parsed_line) - 1:
+                    parsed_line = parsed_line + line[current_point]
 
-                parsed_line = parsed_line + line[char]
+                # check conditions to move on to the next start of the search
+                if current_point > len(line) - 1:
+                    start_point += 1
+                    current_point = start_point
+                    continue
+                elif selection_len > 5:
+                    start_point += 1
+                    current_point = start_point
+                    continue
+                elif line[current_point].isnumeric():
+                    start_point += 1
+                    current_point = start_point
+                    continue
+
+                # check if current selection spells a number
+                current_selection = line[start_point:(current_point + 1)]
+                if selection_len < 3:
+                    current_point += 1
+                    continue
+                elif current_selection in number_map.keys():
+                    number = number_map[current_selection]
+                    diff = len(parsed_line) - current_point
+                    parsed_line = parsed_line[:(
+                        start_point + 2 + diff)]\
+                        + number\
+                        + parsed_line[(start_point + 2 + diff):]
+                    start_point += 1
+                    current_point = start_point
+                    continue
+
             parsed_lines.append(parsed_line)
-    return parsed_lines
+        return parsed_lines
 
 
 def write_file(parsed_list):
     with open("./data/aoc_2023_day_1_1_parsed.txt", "w") as file:
-        file.write("\n".join(line for line in parsed_list))
+        file.write("".join(line for line in parsed_list))
 
 
 def get_numbers():
     ret_list = []
     integers = {str(x) for x in range(0, 10)}
-    with open("./data/aoc_2023_day_1_1_input.txt") as file:
+    with open("./data/aoc_2023_day_1_1_parsed.txt") as file:
         for line in file:
             first_int = None
             second_int = None
@@ -80,6 +90,7 @@ def cumulative_sum(csv):
 
 
 def main():
+    write_file(parse_file())
     parsed_lines = get_numbers()
     print(cumulative_sum(parsed_lines))
 
