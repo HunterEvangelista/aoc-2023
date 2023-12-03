@@ -1,3 +1,6 @@
+import re
+
+
 def parse_file():
     number_map = {
         "zero": "0",
@@ -15,6 +18,8 @@ def parse_file():
     parsed_lines = []
 
     with open("./data/aoc_2023_day_1_1_input.txt", "r") as input:
+        lines = 1
+        print(f"on line {lines}")
         for line in input:
             start_point = 0
             current_point = 0
@@ -22,16 +27,17 @@ def parse_file():
             while start_point < len(line):
                 selection_len = (current_point - start_point) + 1
 
+                if current_point > len(line) - 1:
+                    start_point += 1
+                    current_point = start_point
+                    continue
+
                 # add current element to the parsed string
                 if current_point > len(parsed_line) - 1:
                     parsed_line = parsed_line + line[current_point]
 
                 # check conditions to move on to the next start of the search
-                if current_point > len(line) - 1:
-                    start_point += 1
-                    current_point = start_point
-                    continue
-                elif selection_len > 5:
+                if selection_len > 5:
                     start_point += 1
                     current_point = start_point
                     continue
@@ -42,6 +48,7 @@ def parse_file():
 
                 # check if current selection spells a number
                 current_selection = line[start_point:(current_point + 1)]
+                print(f"current_selection: {current_selection}")
                 if selection_len < 3:
                     current_point += 1
                     continue
@@ -56,8 +63,35 @@ def parse_file():
                     current_point = start_point
                     continue
 
+                current_point += 1
+
+            lines += 1
             parsed_lines.append(parsed_line)
         return parsed_lines
+
+
+def parse_lines_v2():
+    number_map = {
+        "zero": "ze0ro",
+        "one": "o1ne",
+        "two": "t2wo",
+        "three": "th3ree",
+        "four": "fo4ur",
+        "five": "fi5ve",
+        "six": "s6ix",
+        "seven": "se7ven",
+        "eight": "ei8ght",
+        "nine": "ni9ne",
+    }
+    with open("./data/aoc_2023_day_1_1_input.txt", "r") as input:
+        parsed_lines = []
+        for line in input:
+            parsed_line = line
+            for key in number_map.keys():
+                parsed_line = re.sub(key, number_map[key], parsed_line)
+            parsed_lines.append(parsed_line)
+
+    return parsed_lines
 
 
 def write_file(parsed_list):
@@ -90,7 +124,7 @@ def cumulative_sum(csv):
 
 
 def main():
-    write_file(parse_file())
+    write_file(parse_lines_v2())
     parsed_lines = get_numbers()
     print(cumulative_sum(parsed_lines))
 
